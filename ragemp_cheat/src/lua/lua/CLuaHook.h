@@ -1,5 +1,5 @@
 #pragma once
-#pragma comment(lib, "D:/sourca/amthsave7/AMTH/lua/lua/Lua53.lib")
+#pragma comment(lib, "lua53.lib")
 #include "sol.hpp"
 #include <map>
 
