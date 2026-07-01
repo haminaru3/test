@@ -125,7 +125,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{7f399988-0a3e-46c6-8994-5744223d384d}</ProjectGuid>
     <RootNamespace>DirectX11SteamOverlayHook</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
