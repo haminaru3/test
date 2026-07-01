@@ -769,6 +769,7 @@ namespace Aimbot
 #include "src/Main/otherImgui.hpp"
 // auth.h stubbed - auth bypassed
 #include "cpr/cpr.h"
+#include "json/json.hpp"
 struct CAuth {
     bool setup(const char*, const char*) { return true; }
     bool request(const std::string&, const std::string&) { return true; }
