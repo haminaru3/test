@@ -1689,6 +1689,8 @@ void Stealth_menu() {
 			}
 			if (tabs == 4)
 			{
+				static bool lang_initialized = false;
+				if (!lang_initialized) {
 				for (int i = 0; i < sizeof(ppnames) / sizeof(ppnames[0]); ++i)
 				{
 					TextEditor::Identifier id;
@@ -1701,8 +1703,9 @@ void Stealth_menu() {
 					id.mDeclaration = std::string(idecls[i]);
 					lang.mIdentifiers.insert(std::make_pair(std::string(identifiers[i]), id));
 				}
+					lang_initialized = true;
+				}
 				if (fsdjgnsifjdgjsdfjgjksdfgkj == true) {
-					editor.SetLanguageDefinition(lang);
 					///////////////////////////////////////
 					{
 						std::ifstream t(fileToEdit.c_str());
