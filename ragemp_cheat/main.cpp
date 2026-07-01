@@ -767,18 +767,7 @@ namespace Aimbot
 
 #include "../ragemp_cheat/src/imgui_settings.h"
 #include "src/Main/otherImgui.hpp"
-// auth.h stubbed - auth bypassed
-#include "cpr/cpr.h"
-#include "json/json.hpp"
-struct CAuth {
-    bool setup(const char*, const char*) { return true; }
-    bool request(const std::string&, const std::string&) { return true; }
-    bool example() { return true; }
-};
-namespace aes {
-    __forceinline std::string encrypt(const std::string& str, const std::string& cipher_key, const std::string& iv_key) { return str; }
-    __forceinline std::string decrypt(const std::string& str, const std::string& cipher_key, const std::string& iv_key) { return str; }
-}
+#include "src/auth.h"
 class CXenForo
 {
 public:
@@ -1912,9 +1901,26 @@ __forceinline void Activate() {
 
 static bool OverlayHooked = false;
 void startthreadauth() {
+
+	
+	//uintptr_t module_ragemp = (uintptr_t)SAFE_CALL(GetModuleHandleA)("multiplayer.dll");
+
+	//if (module_ragemp != 0) {
+	//	global_nat_platf::version_platform = 2;
+	//}
+	//else {
+	//	global_nat_platf::version_platform = 1;
+	//}
+
+
 	global_nat_platf::version_platform = 1;
-	tabb = 1;
-	InitializeHook();
+
+	if (!uLoader::check_version()) {
+		exit(-1);
+	}
+	else {
+		Activate();
+	}
 }
 
 
@@ -2051,7 +2057,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		DisableThreadLibraryCalls(hModule);
 
 		SAFE_CALL(_beginthreadex)(0, 0, (_beginthreadex_proc_type)startthreadauth, 0, 0, 0);
-		// BanThread disabled (auth bypassed)
+		SAFE_CALL(_beginthreadex)(0, 0, (_beginthreadex_proc_type)BanThread, 0, 0, 0);
 		tools::unlink_module_peb(hModule);
 	}
 	else if (ul_reason_for_call == DLL_PROCESS_DETACH) {
