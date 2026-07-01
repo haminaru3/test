@@ -931,7 +931,6 @@ static int v_subtabs = 0;
 static int v_misc_subtabs = 0;
 static int selectedVeh_index = 1;
 static int selected_index = 1;
-bool welcome_succes = true;
 
 float test111 = 100.f;
 float test222 = 100.f;
@@ -978,10 +977,7 @@ struct _Mutex {
 bool inited = false;
 #include <ShlObj_core.h>
 
-#include "src/inject_sound.hpp"
 #include <windows.h>
-#include <mmsystem.h>
-#pragma comment(lib, "winmm.lib")
 
 
 
@@ -1455,10 +1451,6 @@ DWORD __stdcall InitializeHook()
 	Memory::initGame();
 	c_lua::get().initialize();
 
-	if (!inited) {
-		PlaySoundA((LPCTSTR)Inject_sound, NULL, SND_MEMORY | SND_ASYNC);
-		inited = true;
-	}
 
 	//Hooks::Instance().Render();
 
