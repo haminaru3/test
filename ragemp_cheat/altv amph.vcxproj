@@ -125,7 +125,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{7f399988-0a3e-46c6-8994-5744223d384d}</ProjectGuid>
     <RootNamespace>DirectX11SteamOverlayHook</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -181,14 +181,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;src\ImGui\freetype2-master\include;.;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(ReferencePath)</ReferencePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;.\src\ImGui\freetype-windows-binaries-master\release static\vs2015-2022\win64;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\DXSDK10\Include;$(IncludePath)</IncludePath>
+    <ReferencePath>D:\DXSDK10\Lib\x64;$(ReferencePath)</ReferencePath>
+    <LibraryPath>D:\DXSDK10\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;src\ImGui\freetype2-master\include;.;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;.\src\ImGui\freetype-windows-binaries-master\release static\vs2015-2022\win64;libs\fhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;C:\Users\Fe1ZeP\Desktop\alt-v source\ret9.cc - RAGEMP\ragemp_cheat\src\ImGui\freetype2-master\include;C:\Users\Fe1ZeP\Desktop\alt-v source\ret9.cc - RAGEMP\ragemp_cheat;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Samples\C++\Effects11\;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;C:\Users\Fe1ZeP\Desktop\alt-v source\ret9.cc - RAGEMP\ragemp_cheat\src\ImGui\freetype-windows-binaries-master\release static\vs2015-2022\win64;C:\Users\Fe1ZeP\Desktop\amphetamine.su cs-2\fhook;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -224,9 +224,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <ExceptionHandling />
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
