@@ -1,7 +1,7 @@
-#include <D:\sourca\Loader\libs\CryptoPP\aes.h>
-#include <D:\sourca\Loader\libs\CryptoPP\modes.h>
-#include <D:\sourca\Loader\libs\CryptoPP\base64.h>
-#pragma comment(lib, "D:/sourca/Loader/libs/cryptlib.lib")
+#include "libs/CryptoPP/aes.h"
+#include "libs/CryptoPP/modes.h"
+#include "libs/CryptoPP/base64.h"
+#pragma comment(lib, "libs/cryptlib.lib")
 namespace aes
 {
 	__forceinline std::string encrypt(const std::string& str, const std::string& cipher_key, const std::string& iv_key)
