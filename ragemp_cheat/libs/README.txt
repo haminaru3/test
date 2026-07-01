@@ -1,1 +1,0 @@
-Place cryptlib.lib here
