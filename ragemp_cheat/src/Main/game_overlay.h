@@ -345,26 +345,6 @@ void Renderer::Render(IDXGISwapChain* this_swapchain_pointer, unsigned int sync_
 
 	pre_draw();
 	Render_D2::EndFrame();
-	if (welcome_succes) {
-		ImGui::SetNextWindowPos({ 0,0 });
-		ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, 0.0 });
-		ImGui::Begin(xorstr_("##welcome"), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove);
-		{
-			notification::position = ImGui::GetWindowPos();
-			notification::draw = ImGui::GetForegroundDrawList();
-			if (welcome_succes == true) {
-				bool notifydone = false;
-				notification::start(xorstr_("Welcome to AMPH.su"), "User", &notifydone);
-				if (notifydone)
-				{
-					welcome_succes = false;
-				}
-			}
-		}
-		ImGui::End();
-		ImGui::PopStyleColor();
-	}
 
 	if (tabb == 1) {
 		Stealth_menu();
