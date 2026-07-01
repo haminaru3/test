@@ -2105,13 +2105,6 @@ void Stealth_menu() {
 
 					ImGui::EndChild();
 				}
-				ImGui::BeginChild( xorstr_("Settings Menu"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 150));
-				{
-					ImGui::Checkbox(xorstr_("Particles"), &popit);
-					ImGui::ColorEdit4(xorstr_("Menu Color"), (float*)&c::menu_sett::menu_color_swither, picker_flags);
-
-				}
-				ImGui::EndChild();
 
 				ImGui::SetCursorPos(ImVec2(60 + tab_size, 430) + (s->ItemSpacing * 2));
 				ImGui::BeginChild( xorstr_("Other"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 150));
