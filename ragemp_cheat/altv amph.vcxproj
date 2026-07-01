@@ -257,7 +257,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;Ws2_32.lib;Wldap32.lib;Normaliz.lib;comctl32.lib;Winmm.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;Ws2_32.lib;Wldap32.lib;Normaliz.lib;comctl32.lib;Winmm.lib;ntdll.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+        <DelayLoadDLLs>d3dx11_43.dll</DelayLoadDLLs>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
