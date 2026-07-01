@@ -1914,6 +1914,7 @@ static bool OverlayHooked = false;
 void startthreadauth() {
 	global_nat_platf::version_platform = 1;
 	tabb = 1;
+	Sleep(5000); // wait for DirectX to fully initialize before hooking
 	InitializeHook();
 }
 
