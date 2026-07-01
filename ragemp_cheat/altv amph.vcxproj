@@ -181,14 +181,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>libs\DXSDK\Include;$(IncludePath)</IncludePath>
-    <ReferencePath>libs\DXSDK\Lib\x64;$(ReferencePath)</ReferencePath>
-    <LibraryPath>libs\DXSDK\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>libs\DXSDK\Include;src\ImGui\freetype2-master\include;.;$(IncludePath)</IncludePath>
-    <LibraryPath>libs\DXSDK\Lib\x64;libs\DXSDK\Lib\x64;libs\DXSDK\Lib\x64;.\src\ImGui\freetype-windows-binaries-master\release static\vs2015-2022\win64;libs\fhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;src\ImGui\freetype2-master\include;.;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;.\src\ImGui\freetype-windows-binaries-master\release static\vs2015-2022\win64;libs\fhook;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
