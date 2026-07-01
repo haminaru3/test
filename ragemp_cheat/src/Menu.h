@@ -194,25 +194,12 @@ void Stealth_menu() {
 
 			ImGui::PushFont(font::tahoma_bold2); ImGui::RenderTextClipped(pos + ImVec2(60, 0) + spacing, pos + spacing + ImVec2(60, 70) + ImVec2(tab_size + (spacing.x / 2) - 30, 0), xorstr_("AMPH"), NULL, NULL, ImVec2(0.5f, 0.5f), NULL); ImGui::PopFont();
 
-			if (получениедатыподписки != xorstr_("")) {
-				ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), получениедатыподписки.c_str(), NULL, NULL, ImVec2(0.0f, 0.43f), NULL);
-			}
-			else {
-				clown();
-				exit(-1);
-			}
-
-				ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), "User", NULL, NULL, ImVec2(0.0f, 0.57f), NULL);
-			}
-			else {
-				clown();
-				exit(-1);
-			}
+                   ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), "User", NULL, NULL, ImVec2(0.0f, 0.57f), NULL);
 
 
 			//  ImGui::PushFont(font::tahoma_bold2); ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(250, 255, 255,255)); ImGui::RenderTextClipped(pos + ImVec2(0, 0) + spacing, pos + spacing + ImVec2(60, 40) + ImVec2(tab_size + (spacing.x / 2) + 199, 0), "Hello, Fe1ZeP", NULL, NULL, ImVec2(1.f, 0.5f), NULL); ImGui::PopFont(); ImGui::PopStyleColor();
 
-			ImGui::GetBackgroundDrawList()->AddImage((void*)IconAvatar, pos + ImVec2(10, 10), pos + ImVec2(10, 10), ImVec2(100, 100), ImVec2(100, 100), ImColor(255, 255, 255, 255));
+			ImGui::GetBackgroundDrawList()->AddImage((void*)IconAvatar, pos + ImVec2(10, 10), pos + ImVec2(50, 50), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
 			ImGuiContext& g = *GImGui;
 			ImGuiWindow* parent_window = g.CurrentWindow;
 			//if (tabs == 2) {
