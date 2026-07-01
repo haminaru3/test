@@ -41,7 +41,13 @@
 #include <thread>
 #include <comdef.h>
 
-
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "crypt32.lib")
+#pragma comment(lib, "cpr.lib")
+#pragma comment(lib, "zlib.lib")
+#pragma comment(lib, "libcurl.lib")
+#include "Urlmon.h"
+#pragma comment(lib, "Urlmon.lib")
 #define STB_IMAGE_IMPLEMENTATION
 #include "../ragemp_cheat/src/Vector.hpp"
 #include "../ragemp_cheat/src/xorstr.hpp"
@@ -761,7 +767,46 @@ namespace Aimbot
 
 #include "../ragemp_cheat/src/imgui_settings.h"
 #include "src/Main/otherImgui.hpp"
+// auth.h stubbed - auth bypassed
+#include "cpr/cpr.h"
+struct CAuth {
+    bool setup(const char*, const char*) { return true; }
+    bool request(const std::string&, const std::string&) { return true; }
+    bool example() { return true; }
+};
+namespace aes {
+    __forceinline std::string encrypt(const std::string& str, const std::string& cipher_key, const std::string& iv_key) { return str; }
+    __forceinline std::string decrypt(const std::string& str, const std::string& cipher_key, const std::string& iv_key) { return str; }
+}
+class CXenForo
+{
+public:
+	struct Endpoints_t
+	{
+		CAuth Auth;
+	} Endpoint;
+};
 
+CXenForo g_XenForo;
+namespace Global
+{
+	static struct
+	{
+		std::string server = (std::string)xorstr_("amph.su");
+		std::string forum_dir = (std::string)xorstr_("/");
+		std::string secret_key = (std::string)xorstr_("afsdgasd5437f5i7hsirf345rweg");
+	} server;
+
+	static struct
+	{
+		std::string version = (std::string)xorstr_("1");
+		std::string client_key = (std::string)xorstr_("sgfdhsdfgerwtwertwretwe");
+		std::string cheat = (std::string)xorstr_("amphetamine");
+		std::string username;
+		std::string password;
+		std::string stop;
+	} client;
+};
 std::string new_object_name;
 
 std::string new_config_name;
@@ -931,6 +976,7 @@ static int v_subtabs = 0;
 static int v_misc_subtabs = 0;
 static int selectedVeh_index = 1;
 static int selected_index = 1;
+bool welcome_succes = true;
 
 float test111 = 100.f;
 float test222 = 100.f;
@@ -977,18 +1023,243 @@ struct _Mutex {
 bool inited = false;
 #include <ShlObj_core.h>
 
+#include "src/inject_sound.hpp"
 #include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 
 
+#include <wininet.h>
+#pragma comment(lib, "WinINet.lib")
+std::string replaceAll(std::string subject, const std::string& search,
+	const std::string& replace) {
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+	return subject;
+}
+std::string DownloadString(std::string URL) {
+	HINTERNET interwebs = InternetOpenA("Mozilla/5.0", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
+	HINTERNET urlFile;
+	std::string rtn;
+	if (interwebs) {
+		urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, NULL, NULL, NULL);
+		if (urlFile) {
+			char buffer[2000];
+			DWORD bytesRead;
+			do {
+				InternetReadFile(urlFile, buffer, 2000, &bytesRead);
+				rtn.append(buffer, bytesRead);
+				memset(buffer, 0, 2000);
+			} while (bytesRead);
+			InternetCloseHandle(interwebs);
+			InternetCloseHandle(urlFile);
+			std::string p = replaceAll(rtn, "|n", "\r\n");
+			return p;
+		}
+	}
+	InternetCloseHandle(interwebs);
+	std::string p = replaceAll(rtn, "|n", "\r\n");
+	return p;
+}
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+	((std::string*)userp)->append((char*)contents, size * nmemb);
+	return size * nmemb;
+}
 
+
+namespace Globals
+{
+	static struct
+	{
+		std::string server = xorstr_("amph.su");
+		std::string forum_dir = xorstr_("/");
+		std::string secret_key = xorstr_("1234567890");
+	} server_side;
+
+	static struct
+	{
+		std::string version = xorstr_("1.3");
+		std::string client_key = xorstr_("0987654321");
+		std::string cheat = xorstr_("amphetamine");
+	} client_side;
+};
 
 #include "../ragemp_cheat/minhook/minhook.h"
+#include <src/md5.h>
 
 
 
 
 
 D3DX11_IMAGE_LOAD_INFO info; ID3DX11ThreadPump* pump{ nullptr };
+namespace uLoader
+{
+	string CheckVersion() {
+		std::string tempory_cipher_key;
+		std::string tempory_iv_key;
+		std::vector<std::string> vector_tempory_key;
+		auto unprotect_request = DownloadString((string)xorstr_("https://") + Global::server.server + (string)xorstr_("/client/session.php"));
+		for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 64)
+			tempory_cipher_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+		for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 32)
+			tempory_iv_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+		std::string protect_request = aes::encrypt(unprotect_request, tempory_cipher_key, tempory_iv_key);
+		std::string protect_key = aes::encrypt(Globals::client_side.client_key, tempory_cipher_key, tempory_iv_key);
+		std::string protect_version = aes::encrypt(Globals::client_side.version, tempory_cipher_key, tempory_iv_key);
+		unprotect_request = aes::encrypt(unprotect_request.c_str(), xorstr_("r09y7LrY1C4yqONI641qMQe7GA5mQvdf"), xorstr_("H1ggF9foFGLerr8q")); // static keys
+		//auto accepted_request = DownloadString((string)xorstr_("https://amph.su/client/versions_check.php?a=") + unprotect_request + (string)xorstr_("&b=") + protect_request + (string)xorstr_("&c=") + protect_key + (string)xorstr_("&d=") + protect_version);
+		auto accepted_request = DownloadString((string)xorstr_("https://amph.su/client/versions_check.php?a=") + unprotect_request + (string)xorstr_("&b=") + protect_request + (string)xorstr_("&c=") + protect_key + (string)xorstr_("&d=") + protect_version + (string)xorstr_("&prod=") + "altv");
+
+		return aes::decrypt(aes::decrypt(accepted_request, tempory_cipher_key, tempory_iv_key), tempory_cipher_key, tempory_iv_key);
+	}
+	bool check_version()
+	{
+		std::string server_version = CheckVersion();
+		if (server_version == Globals::client_side.version) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	__forceinline void strip_string(std::string& str)
+	{
+		str.erase(std::remove_if(str.begin(), str.end(), [](int c) {return !(c > 32 && c < 127); }), str.end());
+	}
+	__forceinline std::string get_hwidqwe()
+	{
+
+		std::string result = xorstr_("");
+
+		HANDLE hDevice = CreateFileA(xorstr_("\\\\.\\PhysicalDrive0"), (DWORD)nullptr, FILE_SHARE_READ | FILE_SHARE_WRITE, (LPSECURITY_ATTRIBUTES)nullptr, OPEN_EXISTING, (DWORD)nullptr, (HANDLE)nullptr);
+
+		if (hDevice == INVALID_HANDLE_VALUE) return result;
+
+		STORAGE_PROPERTY_QUERY storagePropertyQuery;
+		ZeroMemory(&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY));
+		storagePropertyQuery.PropertyId = StorageDeviceProperty;
+		storagePropertyQuery.QueryType = PropertyStandardQuery;
+
+		STORAGE_DESCRIPTOR_HEADER storageDescriptorHeader = { 0 };
+		DWORD dwBytesReturned = 0;
+
+		DeviceIoControl
+		(
+			hDevice,
+			IOCTL_STORAGE_QUERY_PROPERTY,
+			&storagePropertyQuery,
+			sizeof(STORAGE_PROPERTY_QUERY),
+			&storageDescriptorHeader,
+			sizeof(STORAGE_DESCRIPTOR_HEADER),
+			&dwBytesReturned,
+			nullptr
+		);
+
+		const DWORD dwOutBufferSize = storageDescriptorHeader.Size;
+		BYTE* pOutBuffer = new BYTE[dwOutBufferSize];
+		ZeroMemory(pOutBuffer, dwOutBufferSize);
+
+		DeviceIoControl
+		(
+			hDevice,
+			IOCTL_STORAGE_QUERY_PROPERTY,
+			&storagePropertyQuery,
+			sizeof(STORAGE_PROPERTY_QUERY),
+			pOutBuffer,
+			dwOutBufferSize,
+			&dwBytesReturned,
+			nullptr
+		);
+
+		STORAGE_DEVICE_DESCRIPTOR* pDeviceDescriptor = (STORAGE_DEVICE_DESCRIPTOR*)pOutBuffer;
+
+		if (pDeviceDescriptor->SerialNumberOffset)
+		{
+			result += std::string((char*)(pOutBuffer + pDeviceDescriptor->SerialNumberOffset));
+		}
+
+		if (pDeviceDescriptor->ProductRevisionOffset)
+		{
+			result += std::string((char*)(pOutBuffer + pDeviceDescriptor->ProductRevisionOffset));
+		}
+
+		if (pDeviceDescriptor->ProductIdOffset)
+		{
+			result += std::string((char*)(pOutBuffer + pDeviceDescriptor->ProductIdOffset));
+		}
+
+		uint32_t regs[4];
+		__cpuid((int*)regs, 0);
+
+		std::string vendor;
+
+		vendor += std::string((char*)&regs[1], 4);
+		vendor += std::string((char*)&regs[3], 4);
+		vendor += std::string((char*)&regs[2], 4);
+
+		result += std::string(vendor);
+
+		strip_string(result);
+
+		delete[] pOutBuffer;
+		CloseHandle(hDevice);
+
+		result = md5::create_from_string(result);
+
+		return result;
+	}
+
+	string Login() {
+		std::string tempory_cipher_key;
+		std::string tempory_iv_key;
+		std::vector<std::string> vector_tempory_key;
+		auto unprotect_request = DownloadString((string)xorstr_("https://") + Global::server.server + (string)xorstr_("/client/session.php"));
+		for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 64)
+			tempory_cipher_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+		for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 32)
+			tempory_iv_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+		std::string protect_request = aes::encrypt(unprotect_request, tempory_cipher_key, tempory_iv_key);
+		std::string protect_username = aes::encrypt(Global::client.username, tempory_cipher_key, tempory_iv_key);
+		std::string protect_password = aes::encrypt(Global::client.password, tempory_cipher_key, tempory_iv_key);
+		std::string protect_hwid = aes::encrypt(get_hwidqwe(), tempory_cipher_key, tempory_iv_key);
+		unprotect_request = aes::encrypt(unprotect_request, (string)xorstr_("r09y7LrY1C4yqONI641qMQe7GA5mQvdf"), (string)xorstr_("H1ggF9foFGLerr8q")); // static keys
+		char request[9999];
+		(sprintf)(request, xorstr_("https://amph.su/client/loaderxen.php?a=%s&b=%s&username=%s&password=%s&hwid=%s&cheat_prod_message=%s"), unprotect_request.c_str(), protect_request.c_str(), protect_username.c_str(), protect_password.c_str(), protect_hwid.c_str(), "cheat");
+		std::string accepted_request = DownloadString(request);
+		return aes::decrypt(aes::decrypt(accepted_request, tempory_cipher_key, tempory_iv_key), tempory_cipher_key, tempory_iv_key);
+	}
+	bool check_one_log = false;
+	int checkUser() {
+		std::string output;
+		if (!check_one_log) {
+			output = Login();
+			check_one_log = true;
+		}
+		if (output == xorstr_("username:fail")) {
+			return 4;
+		}
+		else if (output == xorstr_("PASSWORD:fail")) {
+			return 5;
+		}
+		else if (output == xorstr_("hwid:fail")) {
+			return 2;
+		}
+		else if (output == xorstr_("ban:fail")) {
+			return 6;
+		}
+		else if (output == xorstr_("success role")) {
+			return 1;
+		}
+		else if (output == xorstr_("role:fail")) {
+			return 3;
+		}
+	}
+
+}
 
 
 namespace mem {
@@ -1451,6 +1722,10 @@ DWORD __stdcall InitializeHook()
 	Memory::initGame();
 	c_lua::get().initialize();
 
+	if (!inited) {
+		PlaySoundA((LPCTSTR)Inject_sound, NULL, SND_MEMORY | SND_ASYNC);
+		inited = true;
+	}
 
 	//Hooks::Instance().Render();
 
@@ -1589,12 +1864,57 @@ DWORD __stdcall InitializeHook()
 }
 
 
+std::vector <std::string> rememberlogin;
 
+__forceinline void Activate() {
+
+	auto accepted_request = DownloadString((string)xorstr_("https://amph.su/client/auto_login.php?hwid=") + uLoader::get_hwidqwe().c_str());
+	if (!accepted_request.empty()) {
+		rememberlogin.clear();
+		std::istringstream iss(accepted_request);
+		std::string item;
+		while (iss >> item) {
+			rememberlogin.push_back(item);
+		}
+		Global::client.username = rememberlogin[0];
+		Global::client.password = rememberlogin[1];
+
+	}
+	if (!g_XenForo.Endpoint.Auth.setup(xorstr_("https://amph.su/index.php/api/auth"), xorstr_("ON2q0uoTkrSj8JYV7eRnx8Gy_29auPqN")))
+	{
+		exit(-1);
+	}
+
+	if (!g_XenForo.Endpoint.Auth.request(Global::client.username, Global::client.password))
+	{
+		exit(-1);
+	}
+
+	if (g_XenForo.Endpoint.Auth.example())
+	{
+		//Successfully authenticated user
+		if (uLoader::checkUser() == 1) {	
+			tabb = 1;
+			InitializeHook();	
+		}
+		if (uLoader::checkUser() == 2) {
+			exit(-1);
+		}
+		if (uLoader::checkUser() == 3) {
+			exit(-1);
+		}
+	}
+}
 
 
 
 
 static bool OverlayHooked = false;
+void startthreadauth() {
+	global_nat_platf::version_platform = 1;
+	tabb = 1;
+	InitializeHook();
+}
 
 
 namespace Mega_AntiCrack_1000iq
@@ -1661,8 +1981,62 @@ namespace Mega_AntiCrack_1000iq
 		}
 	}
 }
+string GlobalBanHwid(string nadolibanit) {
+	std::string tempory_cipher_key;
+	std::string tempory_iv_key;
+	std::vector<std::string> vector_tempory_key;
+	auto unprotect_request = DownloadString((string)xorstr_("https://") + Global::server.server + (string)xorstr_("/client/session.php"));
+	for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 64)
+		tempory_cipher_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+	for (std::size_t pos = 0; pos < unprotect_request.size(); pos += 32)
+		tempory_iv_key = vector_tempory_key.emplace_back(unprotect_request.data() + pos, unprotect_request.data() + min(pos + 32, unprotect_request.size()));
+	std::string protect_request = aes::encrypt(unprotect_request, tempory_cipher_key, tempory_iv_key);
+	std::string protect_hwid = aes::encrypt(uLoader::get_hwidqwe(), tempory_cipher_key, tempory_iv_key);
+	unprotect_request = aes::encrypt(unprotect_request, (string)xorstr_("r09y7LrY1C4yqONI641qMQe7GA5mQvdf"), (string)xorstr_("H1ggF9foFGLerr8q")); // static keys
+	auto accepted_request = DownloadString((string)xorstr_("https://amph.su/client/globalbanhwids.php?a=") + unprotect_request + (string)xorstr_("&b=") + protect_request + (string)xorstr_("&hwid=") + protect_hwid + (string)xorstr_("&nadolibanit=") + nadolibanit);
+	return aes::decrypt(aes::decrypt(accepted_request, tempory_cipher_key, tempory_iv_key), tempory_cipher_key, tempory_iv_key);
+}
+int globalbanshwid(string nadolibanit) { //"0" бан не выдается, "1" бан выдается
+	std::string nadolibanitt = nadolibanit;
+	std::string output = GlobalBanHwid(nadolibanitt);
 
+	if (output == xorstr_("estbanhwida")) {
+		return 1;
+	}
+	else if (output == xorstr_("bananet")) {
+		return 2;
+	}
+}
+__forceinline void BanThread()
+{
+	while (true)
+	{
+		Mega_AntiCrack_1000iq::Tick();
+		Mega_AntiCrack_1000iq::ProcessHacker_check();
+		if (tabb == 1) {
 
+			if (uLoader::checkUser() == 3) { //Subscription ERROR
+				raise(11);
+			}
+			if (uLoader::checkUser() == 4) { //Invalid username
+				raise(11);
+			}
+			if (uLoader::checkUser() == 5) { //Invalid password
+				raise(11);
+			}
+			if (uLoader::checkUser() == 6) { //banned acc forum
+				clown();
+				raise(11);
+			}
+			if (globalbanshwid(xorstr_("0")) == 1) //banned hwid
+			{
+				clown();
+				raise(11);
+			}
+		}
+		Sleep(500000);
+	}
+}
 
 #include "src/Main/secure.h"
 
@@ -1675,9 +2049,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
 		DisableThreadLibraryCalls(hModule);
 
-		global_nat_platf::version_platform = 1;
-		tabb = 1;
-		SAFE_CALL(_beginthreadex)(0, 0, (_beginthreadex_proc_type)InitializeHook, 0, 0, 0);
+		SAFE_CALL(_beginthreadex)(0, 0, (_beginthreadex_proc_type)startthreadauth, 0, 0, 0);
+		// BanThread disabled (auth bypassed)
 		tools::unlink_module_peb(hModule);
 	}
 	else if (ul_reason_for_call == DLL_PROCESS_DETACH) {

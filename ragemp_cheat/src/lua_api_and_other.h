@@ -1139,7 +1139,12 @@ ImFont* arial_big;
 
 
 
+bool allow_http = true;
 
+void downloadlua(std::string urldown, std::string puthfile)
+{
+	URLDownloadToFileA(nullptr, urldown.c_str(), puthfile.c_str(), 0, nullptr);
+}
 
 
 //extern "C" NTSTATUS NTAPI RtlAdjustPrivilege(ULONG Privilege, BOOLEAN Enable, BOOLEAN CurrentThread, PBOOLEAN OldValue);
@@ -1383,7 +1388,7 @@ void c_lua::initialize()
 	client[crypt_str("load_script")] = ns_client::load_script;
 	client[crypt_str("unload_script")] = ns_client::unload_script;
 	client[crypt_str("messagebox")] = ns_client::log;
-
+	client[crypt_str("urldownload")] = downloadlua;
 
 
 

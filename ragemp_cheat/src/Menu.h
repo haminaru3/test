@@ -194,12 +194,25 @@ void Stealth_menu() {
 
 			ImGui::PushFont(font::tahoma_bold2); ImGui::RenderTextClipped(pos + ImVec2(60, 0) + spacing, pos + spacing + ImVec2(60, 70) + ImVec2(tab_size + (spacing.x / 2) - 30, 0), xorstr_("AMPH"), NULL, NULL, ImVec2(0.5f, 0.5f), NULL); ImGui::PopFont();
 
-                   ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), "User", NULL, NULL, ImVec2(0.0f, 0.57f), NULL);
+			if (получениедатыподписки != xorstr_("")) {
+				ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), получениедатыподписки.c_str(), NULL, NULL, ImVec2(0.0f, 0.43f), NULL);
+			}
+			else {
+				clown();
+				exit(-1);
+			}
+			if (Global::client.username != xorstr_("")) {
+				ImGui::RenderTextClipped(pos + ImVec2(60 + spacing.x, c::bg::size.y - 60 * 2), pos + spacing + ImVec2(60, c::bg::size.y) + ImVec2(tab_size, 0), Global::client.username.c_str(), NULL, NULL, ImVec2(0.0f, 0.57f), NULL);
+			}
+			else {
+				clown();
+				exit(-1);
+			}
 
 
 			//  ImGui::PushFont(font::tahoma_bold2); ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(250, 255, 255,255)); ImGui::RenderTextClipped(pos + ImVec2(0, 0) + spacing, pos + spacing + ImVec2(60, 40) + ImVec2(tab_size + (spacing.x / 2) + 199, 0), "Hello, Fe1ZeP", NULL, NULL, ImVec2(1.f, 0.5f), NULL); ImGui::PopFont(); ImGui::PopStyleColor();
 
-			ImGui::GetBackgroundDrawList()->AddImage((void*)IconAvatar, pos + ImVec2(10, 10), pos + ImVec2(50, 50), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 255));
+			ImGui::GetBackgroundDrawList()->AddImage((void*)IconAvatar, pos + ImVec2(10, 10), pos + ImVec2(10, 10), ImVec2(100, 100), ImVec2(100, 100), ImColor(255, 255, 255, 255));
 			ImGuiContext& g = *GImGui;
 			ImGuiWindow* parent_window = g.CurrentWindow;
 			//if (tabs == 2) {
@@ -338,6 +351,7 @@ void Stealth_menu() {
 					if (subtab("Local", select_tab_misc == 0)) { select_tab_misc = 0; }
 					if (subtab("Vehicle", select_tab_misc == 1)) { select_tab_misc = 1; }
 					if (subtab("Exploit", select_tab_misc == 2)) { select_tab_misc = 2; }
+					if (subtab("Lists", select_tab_misc == 3)) { select_tab_misc = 3; }
 					ImGui::EndChild();
 
 				} ImGui::EndGroup();
@@ -1667,6 +1681,312 @@ void Stealth_menu() {
 					ImGui::EndGroup();
 
 					break;
+				case 3:
+					ImGui::SetCursorPos(ImVec2(60 + tab_size, -10) + (s->ItemSpacing * 2));
+					//ImGui::SetCursorPos(ImVec2(60 + tab_size, 60) + (s->ItemSpacing * 2));
+					ImGui::BeginGroup();
+					{
+						ImGui::BeginChild(xorstr_("Vehicle List"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 590));
+						{
+
+							hk_ReplayInterface* ReplayInterface = (hk_ReplayInterface*)*(uint64_t*)(Memory::ReplayInterface);
+							if (!ReplayInterface)
+								return;
+							hk_VehicleInterface* VehicleInterface = ReplayInterface->VehicleInterface();
+							if (!VehicleInterface)
+								return;
+
+							if (ListBoxHeader("    ", ImVec2(140, 120)))
+							{
+								for (int i = 0; i < VehicleInterface->VehicleMaximum(); i++) {
+
+									hk_Vehicle* Peds = VehicleInterface->VehicleList()->Vehicle(i);
+									if (!Peds) continue;
+									auto playerName = Peds->VehicleModelInfo()->GetCharName();
+									const char* c = playerName;
+									const char* items[] = { c };
+
+									std::string VehicleName = playerName;
+									VehicleName.append(" ##");
+									VehicleName.append(std::to_string(i));
+									bool is_selected = (selectedVeh_index == i);
+									if (CustomSelectable(VehicleName.c_str(), is_selected))
+									{
+										selectedVeh_index = i;
+									}
+								}
+								ImGui::ListBoxFooter();
+							}
+							hk_Vehicle* SelectedPed = VehicleInterface->VehicleList()->Vehicle(selectedVeh_index);
+
+
+
+
+							if (SelectedPed->GetCoordinate().x != 0)
+							{
+								if (ImGui::Button(xorstr_("Destroy car "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											vehicle::set_vehicle_engine_health(Memory::pointer_to_handle((DWORD64)SelectedPed), 0); //SET_VEHICLE_ENGINE_HEALTH
+											vehicle::set_vehicle_body_health(Memory::pointer_to_handle((DWORD64)SelectedPed), 0); //set_vehicle_body_health
+										});
+								}
+								if (ImGui::Button(xorstr_("Lock vehicle "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											vehicle::set_vehicle_doors_locked(Memory::pointer_to_handle((DWORD64)SelectedPed), 4);
+										});
+								}
+								if (ImGui::Button(xorstr_("TP To Him "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											ped::set_ped_coords_keep_vehicle(player, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z); //SET_PED_COORDS_KEEP_VEHICLE
+										});
+								}
+								if (ImGui::Button(xorstr_("Repair "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(Memory::pointer_to_handle((DWORD64)SelectedPed)); //SET_VEHICLE_DEFORMATION_FIXED
+											VEHICLE::SET_VEHICLE_ENGINE_HEALTH(Memory::pointer_to_handle((DWORD64)SelectedPed), 1000); //SET_VEHICLE_ENGINE_HEALTH
+											VEHICLE::SET_VEHICLE_BODY_HEALTH(Memory::pointer_to_handle((DWORD64)SelectedPed), 1000.0); //set_vehicle_body_health
+											VEHICLE::SET_VEHICLE_DIRT_LEVEL(Memory::pointer_to_handle((DWORD64)SelectedPed), 0);
+											VEHICLE::SET_VEHICLE_FIXED(Memory::pointer_to_handle((DWORD64)SelectedPed));
+										});
+								}
+								if (ImGui::Button(xorstr_("Warp "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto vehicle = Memory::pointer_to_handle((DWORD64)SelectedPed);
+											if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), -1)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), -1);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 0)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 0);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 1)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 1);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 2)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 2);
+											}
+										});
+								}
+								if (ImGui::Button(xorstr_("Shoot bullet   "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto WeaponHash = weapon::get_selected_ped_weapon(player);
+											auto WeaponDamage = weapon::_0x3133b907d8b32053(0xBFEFFF6D, NULL);
+											gameplay::shoot_single_bullet_between_coords(SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z + 2, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z - 1, (int)WeaponDamage, false, 0xBFEFFF6D, player, true, false, 3.f);
+										}
+									);
+								}
+							}
+
+						}
+						ImGui::EndChild();
+					}
+					ImGui::EndGroup();
+					ImGui::SameLine();
+
+					ImGui::BeginGroup();
+					{
+
+						ImGui::BeginChild(xorstr_("Player List"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 590));
+						{
+
+							hk_World* World = (hk_World*)*(uint64_t*)(Memory::World);
+							if (!World)
+								return;
+							hk_Ped* LocalPlayer = World->LocalPlayer();
+							if (!LocalPlayer)
+								return;
+							hk_ReplayInterface* ReplayInterface = (hk_ReplayInterface*)*(uint64_t*)(Memory::ReplayInterface);
+							if (!ReplayInterface)
+								return;
+
+							hk_PedInterface* PedInterface = ReplayInterface->PedInterface();
+							if (!PedInterface)
+								return;
+							if (ListBoxHeader(" ", ImVec2(140, 160)))
+							{
+								for (int i = 0; i < PedInterface->PedMaximum(); i++) {
+
+									hk_Ped* Peds = PedInterface->PedList()->Ped(i);
+									if (!Peds) continue;
+									int PlayerID = Memory::pointer_to_handle((DWORD64)Peds);
+									auto playerName = std::to_string((DWORD64)Peds);
+									const char* c = playerName.c_str();
+									const char* items[] = { c };
+									//if (playerName == "**Invalid**")
+									//{
+									//	//if (!Settings::misc::PedList)
+									//		//continue;
+									//	playerName = "Peds ##" + std::to_string(i);
+
+									//}
+
+									bool is_selected = (selected_index == i);
+									if (CustomSelectable(playerName.c_str(), is_selected))
+									{
+
+										selected_index = i;
+
+									}
+								}
+								ImGui::ListBoxFooter();
+							}
+							hk_Ped* SelectedPed = PedInterface->PedList()->Ped(selected_index);
+							if (SelectedPed->GetCoordinate().x != 0)
+							{
+								if (ImGui::Button(xorstr_("Destroy car  "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto WeaponDamage = weapon::_0x3133b907d8b32053(0xBFEFFF6D, NULL);
+											gameplay::shoot_single_bullet_between_coords(SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z + 2, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z - 1, (int)10000, false, (int32_t)0xBFEFFF6D, player, true, false, 3.f);
+										});
+								}
+								if (ImGui::Button(xorstr_("Lock vehicle  "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto vehicle = ped::get_vehicle_ped_is_in(Memory::pointer_to_handle((DWORD64)SelectedPed), false);
+											vehicle::set_vehicle_doors_locked(vehicle, 4); //SET_VEHICLE_DOORS_LOCKED
+										});
+								}
+								if (ImGui::Button(xorstr_("HandCuff "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											ped::set_enable_handcuffs(Memory::pointer_to_handle((DWORD64)SelectedPed), true);
+										});
+								}
+								if (ImGui::Button(xorstr_("Clone pedestrian"), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											ped::clone_ped_to_target(Memory::pointer_to_handle((DWORD64)SelectedPed), player);
+										});
+								}
+								if (ImGui::Button(xorstr_("Taze player"), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto WeaponHash = weapon::get_selected_ped_weapon(player);
+											auto WeaponDamage = weapon::_0x3133b907d8b32053(0x8BB05FD7, NULL);
+											gameplay::shoot_single_bullet_between_coords(SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z + 2, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z - 1, (int)WeaponDamage, false, 0x8BB05FD7, player, true, false, 3.f);
+										});
+								}
+								if (ImGui::Button(xorstr_("TP To Him  "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											if (SelectedPed != LocalPlayer)
+											{
+												auto player = player::player_ped_id();
+												ped::set_ped_coords_keep_vehicle(player, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z); //SET_PED_COORDS_KEEP_VEHICLE
+											}
+										}
+									);
+								}
+								if (ImGui::Button(xorstr_("Spectate"), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											network::network_set_in_spectator_mode(true, player::get_player_ped_script_index(selected_index)); //NETWORK_SET_IN_SPECTATOR_MODE
+										});
+								}
+								//ImGui::SameLine();
+								if (ImGui::Button(xorstr_("Off Spectate"), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											network::network_set_in_spectator_mode(false, player::get_player_ped_script_index(selected_index));
+										});
+								}
+								if (ImGui::Button(xorstr_("Warp  "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto vehicle = ped::get_vehicle_ped_is_in(Memory::pointer_to_handle((DWORD64)SelectedPed), false);
+											if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), -1)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), -1);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 0)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 0);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 1)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 1);
+											}
+											else if (vehicle::is_vehicle_seat_free(Memory::pointer_to_handle((DWORD64)SelectedPed), 2)) {
+												ped::set_ped_into_vehicle(player, Memory::pointer_to_handle((DWORD64)SelectedPed), 2);
+											}
+										});
+								}
+								if (ImGui::Button(xorstr_("Shoot bullet  "), ImVec2(120, 20)))
+								{
+									rage::native_queue->native_emplace([&]
+										{
+											auto player = player::player_ped_id();
+											auto WeaponHash = weapon::get_selected_ped_weapon(player);
+											auto WeaponDamage = weapon::_0x3133b907d8b32053(0xBFEFFF6D, NULL);
+											gameplay::shoot_single_bullet_between_coords(SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z + 2, SelectedPed->GetCoordinate().x, SelectedPed->GetCoordinate().y, SelectedPed->GetCoordinate().z - 1, (int)WeaponDamage, false, 0xBFEFFF6D, player, true, false, 3.f);
+										});
+								}
+
+								//int PlayerID = FiveM::pointer_to_handle((DWORD64)SelectedPed);
+
+								//if (ImGui::Button("Print Id"))
+								//{
+								//	std::cout << FiveM::pointer_to_handle((DWORD64)SelectedPed);
+								//	std::cout << " + ";
+								//	std::cout << std::to_string(FiveM::pointer_to_handle((DWORD64)SelectedPed));
+								//}
+
+								//auto it = std::find(FiveM::Friend.begin(), FiveM::Friend.end(), GetPlayerNameNew((DWORD64)SelectedPed));
+								//if (it != FiveM::Friend.end())
+								//{
+								//	if (ImGui::Button("Remove Friend"))
+								//	{
+								//		//	auto it = std::find(FiveM::Friend.begin(), FiveM::Friend.end(), (DWORD64)SelectedPed);
+								//		int index = it - FiveM::Friend.begin();
+								//		FiveM::Friend.erase(FiveM::Friend.begin() + index);
+								//	}
+								//}
+								//else
+								//{
+								//	if (ImGui::Button("Add Friend"))
+								//	{
+								//		FiveM::Friend.push_back(GetPlayerNameNew((DWORD64)SelectedPed));
+								//	}
+								//}
+
+								std::string healthtoshow = xorstr_("Health: ") + std::to_string(SelectedPed->GetHealth());
+								ImGui::Text(healthtoshow.c_str());
+
+							}
+						}
+						ImGui::EndChild();
+
+					}
+					ImGui::EndGroup();
+
+
+
+					break;
 				case 4:
 
 
@@ -1676,8 +1996,6 @@ void Stealth_menu() {
 			}
 			if (tabs == 4)
 			{
-				static bool lang_initialized = false;
-				if (!lang_initialized) {
 				for (int i = 0; i < sizeof(ppnames) / sizeof(ppnames[0]); ++i)
 				{
 					TextEditor::Identifier id;
@@ -1690,9 +2008,8 @@ void Stealth_menu() {
 					id.mDeclaration = std::string(idecls[i]);
 					lang.mIdentifiers.insert(std::make_pair(std::string(identifiers[i]), id));
 				}
-					lang_initialized = true;
-				}
 				if (fsdjgnsifjdgjsdfjgjksdfgkj == true) {
+					editor.SetLanguageDefinition(lang);
 					///////////////////////////////////////
 					{
 						std::ifstream t(fileToEdit.c_str());
@@ -2095,6 +2412,13 @@ void Stealth_menu() {
 
 					ImGui::EndChild();
 				}
+				ImGui::BeginChild( xorstr_("Settings Menu"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 150));
+				{
+					ImGui::Checkbox(xorstr_("Particles"), &popit);
+					ImGui::ColorEdit4(xorstr_("Menu Color"), (float*)&c::menu_sett::menu_color_swither, picker_flags);
+
+				}
+				ImGui::EndChild();
 
 				ImGui::SetCursorPos(ImVec2(60 + tab_size, 430) + (s->ItemSpacing * 2));
 				ImGui::BeginChild( xorstr_("Other"), ImVec2((c::bg::size.x - 60 - s->ItemSpacing.x * 4) / 2, 150));
